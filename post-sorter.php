@@ -3,7 +3,7 @@
  * Plugin Name: Post Sorter
  * Plugin URI: https://example.com/post-sorter
  * Description: A simple plugin to sort posts with drag-and-drop functionality and insert new posts
- * Version: 1.1.0
+ * Version: 1.0.1
  * Author: Your Name
  * Author URI: https://example.com
  * License: GPL2
@@ -164,18 +164,21 @@ class Post_Sorter {
                 <div id="post-sorter-message" style="display: none;"></div>
             </div>
             
-            <!-- Insert Modal -->
-            <div id="insert-modal" style="display: none;" class="modal">
-                <div class="modal-content">
-                    <h3>Insert Post</h3>
-                    <input type="text" id="modal-post-search" placeholder="Search posts..." class="regular-text" />
-                    <div id="search-results"></div>
-                    <div class="modal-actions">
-                        <button type="button" class="button button-primary" id="modal-insert">Insert</button>
-                        <button type="button" class="button" id="modal-cancel">Cancel</button>
+            <!-- Placeholder template for inline insertion -->
+            <template id="placeholder-template">
+                <li class="post-item post-placeholder" data-placeholder-id="">
+                    <div class="post-handle">
+                        <span class="dashicons dashicons-plus"></span>
                     </div>
-                </div>
-            </div>
+                    <div class="post-content">
+                        <input type="text" class="placeholder-search" placeholder="Search posts to insert..." />
+                        <div class="placeholder-search-results"></div>
+                    </div>
+                    <div class="post-actions">
+                        <button type="button" class="button button-small placeholder-cancel">Cancel</button>
+                    </div>
+                </li>
+            </template>
         </div>
         <?php
     }
@@ -212,6 +215,24 @@ class Post_Sorter {
         }
         
         return $posts;
+    }
+    
+    private function render_post_item($post, $index) {
+        ?>
+        <li class="post-item" data-post-id="<?php echo esc_attr($post->ID); ?>" data-index="<?php echo esc_attr($index); ?>">
+            <div class="post-handle">
+                <span class="dashicons dashicons-menu"></span>
+            </div>
+            <div class="post-content">
+                <strong><?php echo esc_html($post->post_title); ?></strong>
+                <span class="post-date"><?php echo get_the_date('', $post->ID); ?></span>
+            </div>
+            <div class="post-actions">
+                <button type="button" class="button button-small insert-before" data-index="<?php echo esc_attr($index); ?>">Add Before</button>
+                <button type="button" class="button button-small insert-after" data-index="<?php echo esc_attr($index); ?>">Add After</button>
+            </div>
+        </li>
+        <?php
     }
     
     public function search_posts() {
@@ -257,6 +278,7 @@ class Post_Sorter {
         $position = isset($_POST['position']) ? sanitize_text_field($_POST['position']) : 'after';
         $target_index = isset($_POST['target_index']) ? intval($_POST['target_index']) : 0;
         $post_type = isset($_POST['post_type']) ? sanitize_text_field($_POST['post_type']) : 'post';
+        $return_html = isset($_POST['return_html']) ? (bool)$_POST['return_html'] : false;
         
         if (!$post_id) {
             wp_send_json_error('Invalid post ID');
@@ -300,6 +322,17 @@ class Post_Sorter {
         
         // Set new post's sort order
         update_post_meta($post_id, '_post_sorter_order', $new_order);
+        
+        if ($return_html) {
+            // Get the newly inserted post
+            $post = get_post($post_id);
+            if ($post) {
+                ob_start();
+                $this->render_post_item($post, $new_order);
+                $html = ob_get_clean();
+                wp_send_json_success(array('html' => $html));
+            }
+        }
         
         wp_send_json_success('Post inserted successfully');
     }
