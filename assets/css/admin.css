@@ -1,0 +1,204 @@
+/* Post Sorter Admin Styles */
+.post-sorter-list {
+    list-style: none;
+    padding: 0;
+    margin: 20px 0;
+    max-width: 800px;
+}
+
+.post-item {
+    display: flex;
+    align-items: center;
+    background: #fff;
+    border: 1px solid #ccd0d4;
+    margin-bottom: 10px;
+    padding: 15px;
+    border-radius: 4px;
+    box-shadow: 0 1px 1px rgba(0, 0, 0, 0.04);
+    transition: all 0.3s ease;
+}
+
+.post-item:hover {
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+}
+
+.post-item.ui-sortable-helper {
+    box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
+    transform: rotate(2deg);
+}
+
+.post-handle {
+    cursor: move;
+    padding: 0 15px 0 0;
+    color: #666;
+    font-size: 16px;
+}
+
+.post-content {
+    flex: 1;
+}
+
+.post-content strong {
+    display: block;
+    font-size: 16px;
+    margin-bottom: 5px;
+    color: #23282d;
+}
+
+.post-date {
+    font-size: 13px;
+    color: #666;
+}
+
+.post-actions {
+    display: flex;
+    gap: 5px;
+    margin-left: 10px;
+}
+
+.insert-controls {
+    margin: 20px 0;
+    display: flex;
+    gap: 10px;
+    align-items: center;
+    flex-wrap: wrap;
+}
+
+.insert-controls input {
+    min-width: 200px;
+}
+
+/* Modal styles */
+.modal {
+    display: none;
+    position: fixed;
+    z-index: 1000;
+    left: 0;
+    top: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0, 0, 0, 0.5);
+}
+
+.modal-content {
+    background-color: #fefefe;
+    margin: 15% auto;
+    padding: 20px;
+    border: 1px solid #888;
+    width: 80%;
+    max-width: 500px;
+    border-radius: 4px;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+}
+
+.modal-content h3 {
+    margin-top: 0;
+}
+
+.modal-actions {
+    margin-top: 20px;
+    text-align: right;
+}
+
+.modal-actions button {
+    margin-left: 10px;
+}
+
+/* Message styles */
+.notice-success,
+.notice-error,
+.notice-info {
+    margin: 10px 0;
+    padding: 12px;
+    border-radius: 4px;
+}
+
+.notice-success {
+    background: #d4edda;
+    color: #155724;
+    border: 1px solid #c3e6cb;
+}
+
+.notice-error {
+    background: #f8d7da;
+    color: #721c24;
+    border: 1px solid #f5c6cb;
+}
+
+.notice-info {
+    background: #d1ecf1;
+    color: #0c5460;
+    border: 1px solid #bee5eb;
+}
+
+/* Responsive styles */
+@media screen and (max-width: 782px) {
+    .post-item {
+        flex-direction: column;
+        align-items: flex-start;
+    }
+    
+    .post-actions {
+        margin-left: 0;
+        margin-top: 10px;
+    }
+    
+    .insert-controls {
+        flex-direction: column;
+        align-items: flex-start;
+    }
+    
+    .modal-content {
+        width: 95%;
+        margin: 10% auto;
+    }
+}
+
+/* WordPress admin styles integration */
+.wrap h1 {
+    margin-bottom: 20px;
+}
+
+#post-sorter-container p {
+    margin-bottom: 15px;
+    color: #666;
+}
+
+.post-item-placeholder {
+    background: #f9f9f9;
+    border: 2px dashed #b4b9be;
+    height: 60px;
+    margin-bottom: 10px;
+    border-radius: 4px;
+}
+
+/* Autocomplete styles */
+.ui-autocomplete {
+    max-height: 200px;
+    overflow-y: auto;
+    overflow-x: hidden;
+    z-index: 1001 !important;
+    background: #fff;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+}
+
+.ui-autocomplete .ui-menu-item {
+    padding: 8px 12px;
+    cursor: pointer;
+    border-bottom: 1px solid #eee;
+}
+
+.ui-autocomplete .ui-menu-item:last-child {
+    border-bottom: none;
+}
+
+.ui-autocomplete .ui-menu-item:hover,
+.ui-autocomplete .ui-menu-item.ui-state-focus {
+    background-color: #f0f0f0;
+}
+
+.ui-helper-hidden-accessible {
+    display: none;
+}
