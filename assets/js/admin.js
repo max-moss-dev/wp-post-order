@@ -12,8 +12,20 @@ jQuery(document).ready(function($) {
         placeholder: 'post-item-placeholder',
         cursor: 'move',
         opacity: 0.7,
+        animation: 150,
+        tolerance: 'pointer',
         update: function(event, ui) {
+            // Clear and update indices immediately after move
+            updatePostIndices();
             saveOrder();
+        },
+        start: function(event, ui) {
+            // Clear indices when starting to drag
+            ui.item.removeAttr('data-index');
+        },
+        stop: function(event, ui) {
+            // Ensure indices are updated when drag stops
+            updatePostIndices();
         }
     });
     
@@ -46,12 +58,14 @@ jQuery(document).ready(function($) {
     
     // Insert Before/After buttons
     $(document).on('click', '.insert-before', function() {
-        var index = $(this).data('index');
+        var index = parseInt($(this).attr('data-index'), 10);
         createPlaceholder('before', index);
     });
     
     $(document).on('click', '.insert-after', function() {
-        var index = $(this).data('index');
+        var $button = $(this);
+        var index = parseInt($button.attr('data-index'), 10);
+        
         createPlaceholder('after', index);
     });
     
@@ -152,12 +166,12 @@ jQuery(document).ready(function($) {
             $placeholder.find('.placeholder-search').focus();
         }, 100);
         
-        // Add animation
-        $placeholder.hide().slideDown(200);
+        // Add smooth animation
+        $placeholder.hide().fadeIn(120);
     }
     
     function removePlaceholder($placeholder) {
-        $placeholder.slideUp(200, function() {
+        $placeholder.fadeOut(120, function() {
             $(this).remove();
         });
     }
@@ -204,8 +218,12 @@ jQuery(document).ready(function($) {
         var wasRemoved = false;
         
         if ($existingPost.length > 0) {
-            $existingPost.slideUp(200, function() {
+            // Clear index before removal
+            $existingPost.removeAttr('data-index');
+            $existingPost.fadeOut(120, function() {
                 $(this).remove();
+                // Update all indices after removal
+                updatePostIndices();
                 wasRemoved = true;
                 proceedWithInsertion();
             });
@@ -239,7 +257,7 @@ jQuery(document).ready(function($) {
                             // Replace placeholder with new post
                             var $newPost = $(response.data.html);
                             $placeholder.replaceWith($newPost);
-                            $newPost.hide().slideDown(200);
+                            $newPost.hide().fadeIn(120);
                         } else {
                             // Global search insertion
                             if (targetIndex === -1) {
@@ -252,16 +270,16 @@ jQuery(document).ready(function($) {
                                     $postList.append(response.data.html);
                                 }
                             }
-                            $postList.find('.post-item').last().hide().slideDown(200);
+                            $postList.find('.post-item').last().hide().fadeIn(120);
                         }
                         
                         showMessage('Post inserted successfully!', 'success');
                         
-                        // Update indices
+                        // Clear and update indices immediately
                         updatePostIndices();
                         
-                        // Save order after insertion
-                        setTimeout(saveOrder, 300);
+                        // Save order after insertion with shorter delay
+                        setTimeout(saveOrder, 150);
                     } else {
                         showMessage(response.data || 'Error inserting post', 'error');
                         if ($placeholder) {
@@ -280,6 +298,11 @@ jQuery(document).ready(function($) {
     }
     
     function updatePostIndices() {
+        // Clear all existing indices first
+        $postList.find('.post-item:not(.post-placeholder)').removeAttr('data-index');
+        $postList.find('.insert-before, .insert-after').removeAttr('data-index');
+        
+        // Set new indices
         $postList.find('.post-item:not(.post-placeholder)').each(function(index) {
             $(this).attr('data-index', index);
             $(this).find('.insert-before, .insert-after').attr('data-index', index);
