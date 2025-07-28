@@ -52,21 +52,6 @@ A powerful WordPress plugin that provides an intuitive drag-and-drop interface f
 
 ## 🏗️ Technical Architecture
 
-### Database Structure
-The plugin creates a custom table `wp_post_sorter` with the following schema:
-```sql
-CREATE TABLE wp_post_sorter (
-    id bigint(20) NOT NULL AUTO_INCREMENT,
-    post_id bigint(20) NOT NULL,
-    sort_order int(11) NOT NULL DEFAULT 0,
-    post_type varchar(20) NOT NULL DEFAULT 'post',
-    PRIMARY KEY (id),
-    UNIQUE KEY post_id (post_id),
-    KEY post_type (post_type),
-    KEY sort_order (sort_order)
-);
-```
-
 ### Frontend Integration
 The plugin automatically modifies the main query on:
 - Post type archives
@@ -77,41 +62,6 @@ Sort order is applied using:
 - `orderby`: `meta_value_num`
 - `meta_key`: `_post_sorter_order`
 - `order`: `ASC`
-
-### File Structure
-```
-post-sorter/
-├── post-sorter.php          # Main plugin file
-├── assets/
-│   ├── css/
-│   │   └── admin.css        # Admin interface styles
-│   └── js/
-│       └── admin.js         # Admin interface JavaScript
-└── README.md               # This file
-```
-
-## 🎨 Customization
-
-### CSS Customization
-The plugin uses WordPress admin styles and can be customized by targeting these classes:
-- `.post-sorter-list` - Main container
-- `.post-item` - Individual post items
-- `.post-handle` - Drag handle
-- `.post-placeholder` - Insertion placeholders
-
-### Hooks & Filters
-The plugin provides several WordPress hooks for customization:
-
-#### Actions
-- `post_sorter_before_save_order` - Before saving sort order
-- `post_sorter_after_save_order` - After saving sort order
-- `post_sorter_before_insert_post` - Before inserting a post
-- `post_sorter_after_insert_post` - After inserting a post
-
-#### Filters
-- `post_sorter_supported_post_types` - Modify supported post types
-- `post_sorter_posts_per_page` - Change posts per page in admin
-- `post_sorter_search_results_limit` - Modify search results limit
 
 ## 🔒 Security Features
 
