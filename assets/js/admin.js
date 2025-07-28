@@ -5,6 +5,7 @@ jQuery(document).ready(function($) {
     var $message = $('#post-sorter-message');
     var $template = $('#placeholder-template');
     var placeholderCounter = 0;
+    var isHierarchical = post_sorter_ajax.is_hierarchical || false;
     
     // Initialize sortable
     $postList.sortable({
@@ -15,16 +16,46 @@ jQuery(document).ready(function($) {
         animation: 150,
         tolerance: 'pointer',
         update: function(event, ui) {
-            // Clear and update indices immediately after move
+            // Handle parent-child relationships after drag (only for hierarchical post types)
+            if (isHierarchical) {
+                handleParentChildDrag(ui.item);
+            }
             updatePostIndices();
             saveOrder();
         },
         start: function(event, ui) {
-            // Clear indices when starting to drag
+            // Store children if dragging a parent (only for hierarchical post types)
+            if (isHierarchical) {
+                var $item = ui.item;
+                var postId = $item.data('post-id');
+                var isParent = $item.hasClass('parent-post');
+                
+                if (isParent) {
+                    var $children = $postList.find('.child-post[data-parent-id="' + postId + '"]');
+                    $item.data('dragging-children', $children.toArray());
+                    
+                    // Hide children during drag to avoid confusion
+                    $children.hide();
+                }
+            }
+            
             ui.item.removeAttr('data-index');
         },
         stop: function(event, ui) {
-            // Ensure indices are updated when drag stops
+            // Show any hidden children and move them with parent (only for hierarchical post types)
+            if (isHierarchical) {
+                var $item = ui.item;
+                var draggedChildren = $item.data('dragging-children');
+                
+                if (draggedChildren && draggedChildren.length > 0) {
+                    // Move children to follow their parent
+                    var $children = $(draggedChildren);
+                    $children.show();
+                    $item.after($children);
+                    $item.removeData('dragging-children');
+                }
+            }
+            
             updatePostIndices();
         }
     });
@@ -52,9 +83,58 @@ jQuery(document).ready(function($) {
     
     // Add Last button
     $('#add-last').on('click', function() {
-        var lastIndex = $postList.find('.post-item:not(.post-placeholder)').length;
-        createPlaceholder('after', lastIndex - 1);
+        var lastIndex = $postList.children('.post-item').length - 1;
+        createPlaceholder('after', lastIndex);
     });
+    
+    // Expand/Collapse functionality (only for hierarchical post types)
+    if (isHierarchical) {
+        $(document).on('click', '.expand-toggle', function(e) {
+            e.preventDefault();
+            var $toggle = $(this);
+            var $parentItem = $toggle.closest('.post-item');
+            var parentId = $parentItem.data('post-id');
+            
+            $toggle.toggleClass('collapsed');
+            
+            // Toggle visibility of all child posts
+            var $children = $postList.find('.child-post[data-parent-id="' + parentId + '"]');
+            $children.toggle();
+            
+            // Update the arrow icon
+            var $arrow = $toggle.find('.dashicons');
+            if ($toggle.hasClass('collapsed')) {
+                $arrow.removeClass('dashicons-arrow-down-alt2').addClass('dashicons-arrow-right-alt2');
+            } else {
+                $arrow.removeClass('dashicons-arrow-right-alt2').addClass('dashicons-arrow-down-alt2');
+            }
+        });
+    }
+    
+    // Add Child button functionality (only for hierarchical post types)
+    if (isHierarchical) {
+        $(document).on('click', '.add-child', function(e) {
+            e.preventDefault();
+            var parentId = $(this).data('post-id');
+            var $parentItem = $(this).closest('.post-item');
+            var parentIndex = $parentItem.index();
+            
+            // Find the last child of this parent or the parent itself
+            var insertIndex = parentIndex;
+            var $nextItems = $parentItem.nextAll('.post-item');
+            
+            $nextItems.each(function() {
+                var $item = $(this);
+                if ($item.hasClass('child-post') && $item.data('parent-id') == parentId) {
+                    insertIndex = $item.index();
+                } else if (!$item.hasClass('child-post') || $item.data('parent-id') != parentId) {
+                    return false; // Break the loop
+                }
+            });
+            
+            createChildPlaceholder(parentId, insertIndex);
+        });
+    }
     
     // Insert Before/After buttons
     $(document).on('click', '.insert-before', function() {
@@ -159,6 +239,37 @@ jQuery(document).ready(function($) {
             $postList.append($placeholder);
         } else {
             $items.eq(insertIndex).before($placeholder);
+        }
+        
+        // Focus search input
+        setTimeout(function() {
+            $placeholder.find('.placeholder-search').focus();
+        }, 100);
+        
+        // Add smooth animation
+        $placeholder.hide().fadeIn(120);
+    }
+    
+    function createChildPlaceholder(parentId, insertIndex) {
+        // Remove any existing placeholders
+        $('.post-placeholder').remove();
+        
+        var placeholderId = 'placeholder-' + (++placeholderCounter);
+        var $placeholder = $($template.html());
+        $placeholder.attr('data-placeholder-id', placeholderId);
+        $placeholder.attr('data-position', 'child');
+        $placeholder.attr('data-parent-id', parentId);
+        $placeholder.attr('data-target-index', insertIndex);
+        $placeholder.addClass('child-post');
+        $placeholder.attr('data-parent-id', parentId);
+        
+        // Find insertion point
+        var $items = $postList.find('.post-item:not(.post-placeholder)');
+        
+        if (insertIndex >= $items.length || $items.length === 0) {
+            $postList.append($placeholder);
+        } else {
+            $items.eq(insertIndex).after($placeholder);
         }
         
         // Focus search input

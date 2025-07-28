@@ -91,9 +91,13 @@ class Post_Sorter {
             true
         );
         
+        $current_post_type = isset($_GET['post_type']) ? sanitize_text_field($_GET['post_type']) : 'post';
+        
         wp_localize_script('post-sorter-admin', 'post_sorter_ajax', array(
             'ajax_url' => admin_url('admin-ajax.php'),
-            'nonce' => wp_create_nonce('post_sorter_nonce')
+            'nonce' => wp_create_nonce('post_sorter_nonce'),
+            'current_post_type' => $current_post_type,
+            'is_hierarchical' => $this->is_post_type_hierarchical($current_post_type)
         ));
         
         wp_enqueue_style(
@@ -116,6 +120,7 @@ class Post_Sorter {
             $selected_post_type = 'post';
         }
         
+        $is_hierarchical = $this->is_post_type_hierarchical($selected_post_type);
         $posts = $this->get_posts_for_sorting($selected_post_type);
         
         ?>
@@ -144,18 +149,46 @@ class Post_Sorter {
                 </div>
                 
                 <ul id="post-sorter-list" class="post-sorter-list">
-                    <?php foreach ($posts as $index => $post) : ?>
-                        <li class="post-item" data-post-id="<?php echo esc_attr($post->ID); ?>" data-index="<?php echo esc_attr($index); ?>">
+                    <?php foreach ($posts as $index => $post) : 
+                        // Only show hierarchical features for hierarchical post types
+                        $is_child = $is_hierarchical && isset($post->_is_child) && $post->_is_child;
+                        $parent_id = $is_hierarchical && isset($post->_parent_id) ? $post->_parent_id : 0;
+                        $has_children = $is_hierarchical && $this->post_has_children($post->ID, $posts);
+                    ?>
+                        <li class="post-item <?php echo $is_hierarchical && $is_child ? 'child-post' : 'parent-post'; ?>" 
+                            data-post-id="<?php echo esc_attr($post->ID); ?>" 
+                            data-index="<?php echo esc_attr($index); ?>"
+                            <?php if ($is_hierarchical) : ?>
+                                data-parent-id="<?php echo esc_attr($parent_id); ?>"
+                                <?php echo $is_child ? 'data-is-child="true"' : ''; ?>
+                            <?php endif; ?>>
+                            
                             <div class="post-handle">
                                 <span class="dashicons dashicons-menu"></span>
                             </div>
+                            
+                            <?php if ($is_hierarchical && !$is_child && $has_children) : ?>
+                            <div class="expand-toggle">
+                                <span class="dashicons dashicons-arrow-down-alt2" title="Expand/Collapse"></span>
+                            </div>
+                            <?php endif; ?>
+                            
                             <div class="post-content">
                                 <strong><?php echo esc_html($post->post_title); ?></strong>
                                 <span class="post-date"><?php echo get_the_date('', $post->ID); ?></span>
+                                <?php if ($is_hierarchical && $is_child) : ?>
+                                    <span class="child-indicator">(Child)</span>
+                                <?php elseif ($is_hierarchical && $has_children) : ?>
+                                    <span class="parent-indicator">(Parent)</span>
+                                <?php endif; ?>
                             </div>
+                            
                             <div class="post-actions">
                                 <button type="button" class="button button-small insert-before" data-index="<?php echo esc_attr($index); ?>">Add Before</button>
                                 <button type="button" class="button button-small insert-after" data-index="<?php echo esc_attr($index); ?>">Add After</button>
+                                <?php if ($is_hierarchical && !$is_child) : ?>
+                                    <button type="button" class="button button-small add-child" data-post-id="<?php echo esc_attr($post->ID); ?>">Add Child</button>
+                                <?php endif; ?>
                             </div>
                         </li>
                     <?php endforeach; ?>
@@ -214,7 +247,58 @@ class Post_Sorter {
             ));
         }
         
+        // Only build hierarchical list for hierarchical post types
+        if ($this->is_post_type_hierarchical($post_type)) {
+            return $this->build_hierarchical_list($posts);
+        }
+        
         return $posts;
+    }
+    
+    private function build_hierarchical_list($posts) {
+        $hierarchical = array();
+        $children = array();
+        
+        // Group posts by parent
+        foreach ($posts as $post) {
+            if ($post->post_parent == 0) {
+                $hierarchical[] = $post;
+            } else {
+                if (!isset($children[$post->post_parent])) {
+                    $children[$post->post_parent] = array();
+                }
+                $children[$post->post_parent][] = $post;
+            }
+        }
+        
+        // Build the final hierarchical array
+        $result = array();
+        foreach ($hierarchical as $parent) {
+            $result[] = $parent;
+            if (isset($children[$parent->ID])) {
+                foreach ($children[$parent->ID] as $child) {
+                    $child->_is_child = true;
+                    $child->_parent_id = $parent->ID;
+                    $result[] = $child;
+                }
+            }
+        }
+        
+        return $result;
+    }
+    
+    private function post_has_children($post_id, $posts) {
+        foreach ($posts as $post) {
+            if (isset($post->_parent_id) && $post->_parent_id == $post_id) {
+                return true;
+            }
+        }
+        return false;
+    }
+    
+    private function is_post_type_hierarchical($post_type) {
+        $post_type_object = get_post_type_object($post_type);
+        return $post_type_object && $post_type_object->hierarchical;
     }
     
     private function render_post_item($post, $index) {

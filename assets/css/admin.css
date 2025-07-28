@@ -50,6 +50,76 @@
     color: #666;
 }
 
+/* Hierarchical Parent-Child Styles */
+.child-post {
+    margin-left: 40px;
+    border-left: 3px solid #0073aa;
+    background: #f9f9f9;
+}
+
+.child-post .post-handle {
+    color: #0073aa;
+}
+
+.parent-post {
+    position: relative;
+}
+
+.expand-toggle {
+    cursor: pointer;
+    padding: 0 10px;
+    color: #666;
+    font-size: 16px;
+    transition: transform 0.2s ease;
+}
+
+.expand-toggle:hover {
+    color: #0073aa;
+}
+
+.expand-toggle.collapsed {
+    transform: rotate(-90deg);
+}
+
+.child-indicator,
+.parent-indicator {
+    font-size: 11px;
+    color: #666;
+    font-style: italic;
+    margin-left: 8px;
+}
+
+.child-indicator {
+    color: #0073aa;
+}
+
+.parent-indicator {
+    color: #d63638;
+}
+
+.post-item.collapsed + .child-post {
+    display: none;
+}
+
+.post-item.ui-sortable-helper.parent-post {
+    box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3);
+}
+
+.post-item.ui-sortable-helper.child-post {
+    box-shadow: 0 3px 10px rgba(0, 115, 170, 0.3);
+    border-left-color: #0073aa;
+}
+
+.add-child {
+    background-color: #0073aa !important;
+    color: white !important;
+    border-color: #005a87 !important;
+}
+
+.add-child:hover {
+    background-color: #005a87 !important;
+}
+
 .post-actions {
     display: flex;
     gap: 5px;
