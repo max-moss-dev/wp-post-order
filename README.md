@@ -5,19 +5,11 @@ A powerful WordPress plugin that provides an intuitive drag-and-drop interface f
 ## 🚀 Features
 
 ### Core Functionality
+- **Position-Specific Insertion**: Insert posts before or after any existing post
 - **Drag & Drop Sorting**: Intuitive drag-and-drop interface for reordering posts
 - **Multi Post Type Support**: Works with all public post types (posts, pages, custom post types)
 - **Live Search & Insert**: Real-time search functionality to find and insert posts at specific positions
-- **Visual Feedback**: Smooth animations and visual indicators during sorting operations
 - **Persistent Ordering**: Custom sort order is maintained across the frontend
-
-### Advanced Features
-- **Position-Specific Insertion**: Insert posts before or after any existing post
-- **Global Search**: Quick search bar for adding posts to the end of the list
-- **Placeholder System**: Interactive placeholders for precise post insertion
-- **Keyboard Navigation**: Full keyboard support for accessibility
-- **Auto-Save**: Automatic saving of sort order changes
-- **Responsive Design**: Mobile-friendly admin interface
 
 ## 📋 Requirements
 
@@ -47,11 +39,6 @@ A powerful WordPress plugin that provides an intuitive drag-and-drop interface f
 2. Select the post type you want to sort from the dropdown
 3. Drag posts up or down using the handle (≡ icon) on the left
 4. Changes are automatically saved
-
-### Adding Posts
-- **Add First**: Click "Add First" to insert a post at the beginning
-- **Add Last**: Use the global search bar to add posts to the end
-- **Insert Between**: Click "Add Before" or "Add After" buttons next to any post
 
 ### Search & Insert
 1. Click any "Add Before/After" button to create a placeholder
@@ -134,22 +121,6 @@ The plugin provides several WordPress hooks for customization:
 - **SQL Injection Protection**: Uses WordPress database methods
 - **XSS Prevention**: All output is properly escaped
 
-## 🌐 Browser Support
-
-- Chrome 70+
-- Firefox 65+
-- Safari 12+
-- Edge 79+
-- Internet Explorer 11 (limited support)
-
-## ♿ Accessibility
-
-The plugin follows WordPress accessibility guidelines:
-- Full keyboard navigation support
-- Screen reader compatible
-- High contrast mode support
-- Reduced motion support for users with vestibular disorders
-- Proper ARIA labels and roles
 
 ## 🐛 Troubleshooting
 
@@ -190,13 +161,12 @@ Based on the memory context, the following hierarchical features are planned:
 
 ## 📝 Changelog
 
-### Version 1.0.1
+### Version 1.0.0
 - Initial release
 - Drag and drop sorting functionality
 - Multi post type support
 - Search and insert capabilities
 - Responsive admin interface
-- Accessibility improvements
 
 ## 👥 Contributing
 
@@ -217,15 +187,6 @@ For support, please:
 2. Search existing issues in the repository
 3. Create a new issue with detailed information
 4. Include WordPress version, PHP version, and error messages
-
-## 🙏 Credits
-
-Developed with ❤️ for the WordPress community.
-
-- **Author**: Max Moss
-- **Version**: 1.0.0
-- **WordPress Compatibility**: 5.0+
-- **PHP Compatibility**: 7.4+
 
 ---
 
