@@ -45,27 +45,11 @@
     color: #23282d;
 }
 
-.post-date {
-    font-size: 13px;
-    color: #666;
-}
 
 .post-actions {
     display: flex;
     gap: 5px;
     margin-left: 10px;
-}
-
-.insert-controls {
-    margin: 20px 0;
-    display: flex;
-    gap: 10px;
-    align-items: center;
-    flex-wrap: wrap;
-}
-
-.insert-controls input {
-    min-width: 200px;
 }
 
 /* Placeholder styles */
@@ -195,10 +179,6 @@
         margin-top: 10px;
     }
     
-    .insert-controls {
-        flex-direction: column;
-        align-items: flex-start;
-    }
 }
 
 /* WordPress admin styles integration */

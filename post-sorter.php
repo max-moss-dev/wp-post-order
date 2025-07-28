@@ -137,12 +137,6 @@ class Post_Sorter {
             <div id="post-sorter-container">
                 <p>Drag and drop posts to reorder them, or use the buttons below to insert new posts.</p>
                 
-                <div class="insert-controls">
-                    <input type="text" id="post-search" placeholder="Search posts to insert..." class="regular-text" />
-                    <button type="button" class="button" id="add-first">Add First</button>
-                    <button type="button" class="button" id="add-last">Add Last</button>
-                </div>
-                
                 <ul id="post-sorter-list" class="post-sorter-list">
                     <?php foreach ($posts as $index => $post) : ?>
                         <li class="post-item" data-post-id="<?php echo esc_attr($post->ID); ?>" data-index="<?php echo esc_attr($index); ?>">
@@ -151,7 +145,6 @@ class Post_Sorter {
                             </div>
                             <div class="post-content">
                                 <strong><?php echo esc_html($post->post_title); ?></strong>
-                                <span class="post-date"><?php echo get_the_date('', $post->ID); ?></span>
                             </div>
                             <div class="post-actions">
                                 <button type="button" class="button button-small insert-before" data-index="<?php echo esc_attr($index); ?>">Add Before</button>
@@ -225,7 +218,6 @@ class Post_Sorter {
             </div>
             <div class="post-content">
                 <strong><?php echo esc_html($post->post_title); ?></strong>
-                <span class="post-date"><?php echo get_the_date('', $post->ID); ?></span>
             </div>
             <div class="post-actions">
                 <button type="button" class="button button-small insert-before" data-index="<?php echo esc_attr($index); ?>">Add Before</button>

@@ -205,7 +205,7 @@ jQuery(document).ready(function($) {
         
         results.forEach(function(post) {
             var $result = $('<div class="placeholder-result" data-post-id="' + post.id + '">');
-            $result.html('<strong>' + escapeHtml(post.label) + '</strong><br><small>' + escapeHtml(post.date) + '</small>');
+            $result.html('<strong>' + escapeHtml(post.label) + '</strong>');
             $container.append($result);
         });
     }
