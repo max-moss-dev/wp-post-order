@@ -1,11 +1,9 @@
 <?php
 /**
  * Plugin Name: Post Sorter
- * Plugin URI: https://example.com/post-sorter
- * Description: A simple plugin to sort posts with drag-and-drop functionality and insert new posts
- * Version: 1.0.1
- * Author: Your Name
- * Author URI: https://example.com
+ * Description: A simple plugin to sort posts with drag-and-drop functionality and insert post to any position
+ * Version: 1.0.0
+ * Author: Max Moss
  * License: GPL2
  * Text Domain: post-sorter
  */
